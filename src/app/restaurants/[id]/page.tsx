@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getRestaurantById } from "@/lib/reservations";
 import { ReservationForm } from "@/components/reservation-form";
+import { parsePositiveIntId } from "@/lib/ids";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,13 @@ export default async function RestaurantPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const restaurant = await getRestaurantById(Number(id));
+  const restaurantId = parsePositiveIntId(id);
+
+  if (restaurantId === null) {
+    notFound();
+  }
+
+  const restaurant = await getRestaurantById(restaurantId);
 
   if (!restaurant) {
     notFound();

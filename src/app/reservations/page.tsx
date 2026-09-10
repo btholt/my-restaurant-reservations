@@ -1,4 +1,5 @@
 import { getReservationsForRestaurant } from "@/lib/reservations";
+import { parsePositiveIntId } from "@/lib/ids";
 
 export const dynamic = "force-dynamic";
 
@@ -7,9 +8,12 @@ export default async function ReservationsPage({
 }: {
   searchParams: Promise<{ restaurantId?: string }>;
 }) {
-  const { restaurantId } = await searchParams;
+  const { restaurantId: restaurantIdParam } = await searchParams;
+  const restaurantId = restaurantIdParam
+    ? parsePositiveIntId(restaurantIdParam)
+    : null;
 
-  if (!restaurantId) {
+  if (restaurantId === null) {
     return (
       <p className="text-sm text-black/60 dark:text-white/60">
         Pass a <code>restaurantId</code> query parameter to view its
@@ -18,9 +22,7 @@ export default async function ReservationsPage({
     );
   }
 
-  const reservations = await getReservationsForRestaurant(
-    Number(restaurantId),
-  );
+  const reservations = await getReservationsForRestaurant(restaurantId);
 
   return (
     <div className="flex flex-col gap-4">

@@ -5,18 +5,28 @@ import {
   getReservationsForRestaurant,
 } from "@/lib/reservations";
 import { createReservationSchema } from "@/lib/validation";
+import { parsePositiveIntId } from "@/lib/ids";
 
 export async function GET(request: NextRequest) {
-  const restaurantId = request.nextUrl.searchParams.get("restaurantId");
+  const restaurantIdParam = request.nextUrl.searchParams.get("restaurantId");
 
-  if (!restaurantId) {
+  if (!restaurantIdParam) {
     return NextResponse.json(
       { error: "restaurantId query parameter is required" },
       { status: 400 },
     );
   }
 
-  const reservations = await getReservationsForRestaurant(Number(restaurantId));
+  const restaurantId = parsePositiveIntId(restaurantIdParam);
+
+  if (restaurantId === null) {
+    return NextResponse.json(
+      { error: "restaurantId must be a positive integer" },
+      { status: 400 },
+    );
+  }
+
+  const reservations = await getReservationsForRestaurant(restaurantId);
   return NextResponse.json({ reservations });
 }
 

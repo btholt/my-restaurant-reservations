@@ -28,21 +28,16 @@ export async function getReservationsForRestaurant(restaurantId: number) {
 }
 
 async function findOrCreateCustomer(name: string, email: string) {
-  const [existing] = await db
-    .select()
-    .from(customers)
-    .where(eq(customers.email, email));
-
-  if (existing) {
-    return existing;
-  }
-
-  const [created] = await db
+  const [customer] = await db
     .insert(customers)
     .values({ name, email })
+    .onConflictDoUpdate({
+      target: customers.email,
+      set: { name },
+    })
     .returning();
 
-  return created;
+  return customer;
 }
 
 export async function createReservation(input: CreateReservationInput) {
