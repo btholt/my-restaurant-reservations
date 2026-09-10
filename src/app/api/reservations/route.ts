@@ -31,8 +31,18 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  let body: unknown;
+
   try {
-    const body = await request.json();
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { error: "Request body must be valid JSON" },
+      { status: 400 },
+    );
+  }
+
+  try {
     const input = createReservationSchema.parse(body);
     const reservation = await createReservation(input);
     return NextResponse.json({ reservation }, { status: 201 });
