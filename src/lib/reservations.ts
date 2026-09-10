@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, notInArray } from "drizzle-orm";
 import { db } from "@/db";
 import { customers, reservations, restaurants, tables } from "@/db/schema";
 import type { CreateReservationInput } from "@/lib/validation";
@@ -64,7 +64,12 @@ export async function cancelReservation(id: number) {
   const [updated] = await db
     .update(reservations)
     .set({ status: "cancelled" })
-    .where(eq(reservations.id, id))
+    .where(
+      and(
+        eq(reservations.id, id),
+        notInArray(reservations.status, ["cancelled", "completed"]),
+      ),
+    )
     .returning();
 
   return updated;

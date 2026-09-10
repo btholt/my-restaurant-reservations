@@ -54,6 +54,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.error("Failed to create reservation:", error);
     return NextResponse.json(
       { error: "Failed to create reservation" },
       { status: 500 },
