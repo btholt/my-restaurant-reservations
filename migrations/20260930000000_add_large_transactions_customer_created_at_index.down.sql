@@ -1,0 +1,1 @@
+DROP INDEX CONCURRENTLY idx_large_transactions_customer_created_at;
